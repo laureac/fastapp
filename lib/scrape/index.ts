@@ -26,6 +26,7 @@ export async function scrapeAmazonPdt(productUrl: string) {
     const $ = cheerio.load(response.data);
     const title = $("#productTitle").text().trim();
     const price = extractPrice(
+      $(".priceToPay span.a-offscreen"),
       $(".a-price.a-text-price span.a-offscreen"),
       $("#listPrice"),
       $("#priceblock_dealprice"),
@@ -35,7 +36,7 @@ export async function scrapeAmazonPdt(productUrl: string) {
     const imageUrl = Object.keys(JSON.parse(image))[0];
 
     const data = {
-      price: Number(price),
+      price,
       title,
       imageUrl,
     };

@@ -1,19 +1,22 @@
 import mongoose from "mongoose";
 
-let isConnected: boolean = false;
-const MONGODB_URI = String(process.env.MONGODB_URI);
+let isConnected = false;
 
 export const connectToDb = async () => {
   mongoose.set("strictQuery", true);
 
-  if (MONGODB_URI === undefined) return console.log("No MONGODB_URI");
-  if (isConnected) return console.log("Already connected to DB");
+  if (!process.env.MONGODB_URI)
+    return console.log("MONGODB_URI is not defined");
+
+  if (isConnected) return console.log("=> existing database connection");
 
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
+
     isConnected = true;
-    return console.log("Connected to DB");
-  } catch (e: any) {
-    throw new Error(`Error connecting to DB: ${e.message}`);
+
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.log(error);
   }
 };

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { scrapeAndStore } from "@/lib/actions";
-import Image from "next/image";
+import { Product } from "@/types/types";
 
 const verifyAmazonUrl = (url: string) => {
   try {
@@ -18,19 +18,15 @@ const verifyAmazonUrl = (url: string) => {
   return false;
 };
 
-type Product = {
-  title: string;
-  imageUrl: string;
-  price: number;
-  description?: string;
+type SearchFormProps = {
+  setProduct: React.Dispatch<React.SetStateAction<Product | null | undefined>>;
 };
 
-const SearchForm = () => {
+const SearchForm: React.FC<SearchFormProps> = ({ setProduct }) => {
   //state setters
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [product, setProduct] = useState<Product | null | undefined>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,17 +45,24 @@ const SearchForm = () => {
     } catch (e) {
     } finally {
       setLoading(false);
+      setSearch("");
     }
   };
-  console.log(product);
+
   return (
-    <form onSubmit={handleSubmit}>
-      <Input onChange={(e) => setSearch(e.target.value)} type="input" />
+    <form onSubmit={handleSubmit} className="flex w-full max-w-lg mx-auto">
+      <Input
+        onChange={(e) => {
+          setSearch(e.target.value);
+        }}
+        type="input"
+        placeholder="Type something..."
+        value={search}
+      />
       {error !== "" && <p className="text-red-500">{error}</p>}
-      <Button type="submit" disabled={search === ""}>
+      <Button type="submit" disabled={search === ""} className="ml-4 w-60">
         {loading ? "Loading..." : "Search"}
       </Button>
-      {product && <img src={product.imageUrl} alt={product.title} />}
     </form>
   );
 };

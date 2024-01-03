@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { extractPrice } from "../utils";
 
 export async function scrapeAmazonPdt(productUrl: string) {
   if (!productUrl) return;
@@ -24,8 +25,23 @@ export async function scrapeAmazonPdt(productUrl: string) {
 
     const $ = cheerio.load(response.data);
     const title = $("#productTitle").text().trim();
-    console.log(title);
-    return title;
+    const price = extractPrice(
+      $(".a-price.a-text-price span.a-offscreen"),
+      $("#listPrice"),
+      $("#priceblock_dealprice"),
+      $(".a-size-base.a-color-price")
+    );
+    const image = $("#landingImage").attr("data-a-dynamic-image") || "{}";
+    const imageUrls = Object.keys(JSON.parse(image))[0];
+
+    const data = {
+      price: Number(price),
+      title,
+      imageUrls,
+    };
+
+    console.log(data);
+    return data;
   } catch (e: any) {
     throw new Error(`Error scraping: ${e.message}`);
   }

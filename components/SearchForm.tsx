@@ -1,16 +1,14 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { scrapeAndStore } from "@/lib/actions";
+import Image from "next/image";
 
 const verifyAmazonUrl = (url: string) => {
   try {
     const parsedUrl = new URL(url);
-    if (
-      parsedUrl.hostname.includes("amazon.") ||
-      parsedUrl.hostname.endsWith("amazon")
-    ) {
+    if (parsedUrl.hostname.includes("amazon.")) {
       return true;
     }
   } catch (e) {
@@ -20,10 +18,19 @@ const verifyAmazonUrl = (url: string) => {
   return false;
 };
 
+type Product = {
+  title: string;
+  image: string;
+  price: string;
+  description?: string;
+};
+
 const SearchForm = () => {
   //state setters
-  const [search, setSearch] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [product, setProduct] = useState<Product | null | undefined>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,25 +38,30 @@ const SearchForm = () => {
     const isValidUrl = verifyAmazonUrl(search);
 
     if (!isValidUrl) {
-      alert("Please enter a valid Amazon URL");
+      setError("Please enter a valid Amazon URL");
+      return;
     }
 
     try {
       setLoading(true);
       const product = await scrapeAndStore(search);
-      console.log(product);
+      setProduct(product);
     } catch (e) {
     } finally {
       setLoading(false);
     }
   };
-
+  console.log(product);
   return (
     <form onSubmit={handleSubmit}>
       <Input onChange={(e) => setSearch(e.target.value)} type="input" />
+      {error !== "" && <p className="text-red-500">{error}</p>}
       <Button type="submit" disabled={search === ""}>
         {loading ? "Loading..." : "Search"}
       </Button>
+      {product && (
+        <img data-a-dynamic-image={product.image} alt={product.title} />
+      )}
     </form>
   );
 };

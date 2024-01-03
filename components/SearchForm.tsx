@@ -20,8 +20,8 @@ const verifyAmazonUrl = (url: string) => {
 
 type Product = {
   title: string;
-  image: string;
-  price: string;
+  imageUrl: string;
+  price: number;
   description?: string;
 };
 
@@ -59,9 +59,7 @@ const SearchForm = () => {
       <Button type="submit" disabled={search === ""}>
         {loading ? "Loading..." : "Search"}
       </Button>
-      {product && (
-        <img data-a-dynamic-image={product.image} alt={product.title} />
-      )}
+      {product && <img src={product.imageUrl} alt={product.title} />}
     </form>
   );
 };

@@ -32,12 +32,12 @@ export async function scrapeAmazonPdt(productUrl: string) {
       $(".a-size-base.a-color-price")
     );
     const image = $("#landingImage").attr("data-a-dynamic-image") || "{}";
-    const imageUrls = Object.keys(JSON.parse(image))[0];
+    const imageUrl = Object.keys(JSON.parse(image))[0];
 
     const data = {
       price: Number(price),
       title,
-      imageUrls,
+      imageUrl,
     };
 
     console.log(data);
